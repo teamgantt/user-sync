@@ -12,5 +12,5 @@ interface SyncableUserInterface
      *
      * @return string
      */
-    public function getEmailAddress();
+    public function getSyncableUsername();
 }

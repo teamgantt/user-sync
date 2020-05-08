@@ -19,7 +19,7 @@ describe('CognitoSync', function () {
         $this->sync = new CognitoSync($this->client, $this->detail, $this->logger);
 
         allow($this->detail)->toReceive('getPoolId')->andReturn('pool-id');
-        allow($this->user)->toReceive('getEmailAddress')->andReturn('dev@tg.com');
+        allow($this->user)->toReceive('getSyncableUsername')->andReturn('dev@tg.com');
     });
 
     describe('__invoke()', function () {
@@ -44,7 +44,7 @@ describe('CognitoSync', function () {
 
         it('should sync the email to what is in the request', function () {
             $request = SyncRequest::fromArray(['email_address' => 'dev@tg.com']);
-            allow($this->user)->toReceive('getEmailAddress')->andReturn('original@tg.com');
+            allow($this->user)->toReceive('getSyncableUsername')->andReturn('original@tg.com');
 
             allow($this->client)->toReceive('adminUpdateUserAttributes')->andReturn(true);
             expect($this->client)->toReceive('adminUpdateUserAttributes')->with([

@@ -64,7 +64,7 @@ class CognitoSync implements SyncInterface
                 $this->client->adminSetUserPassword([
                     'Password' => $request->getPassword(),
                     'Permanent' => true,
-                    'Username' => $user->getEmailAddress(),
+                    'Username' => $user->getSyncableUsername(),
                     'UserPoolId' => $this->clientDetail->getPoolId(),
                 ]);
             }
@@ -72,7 +72,7 @@ class CognitoSync implements SyncInterface
             if ($request->hasEmailAddress()) {
                 $this->client->adminUpdateUserAttributes([
                     'UserPoolId' => $this->clientDetail->getPoolId(),
-                    'Username' => $user->getEmailAddress(),
+                    'Username' => $user->getSyncableUsername(),
                     'UserAttributes' => [
                         [
                             'Name' => 'email',
