@@ -21,5 +21,8 @@
     "require-dev": {
         "aws/aws-sdk-php": "^3.137",
         "kahlan/kahlan": "^4.7"
+    },
+    "scripts": {
+        "test": "kahlan"
     }
 }
