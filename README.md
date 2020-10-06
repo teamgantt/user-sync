@@ -11,6 +11,9 @@ Currently deals in syncing passwords and email addresses. This is for use cases 
 may require it, though the typical use case does not involve syncing passwords. The case
 for syncing a password may make sense during a period of migration or phasing out local storage of passwords.
 
+Users can be deleted by constructing a `SyncRequestInterface` whose `getAction` method returns the string literal `'delete'`.
+
+Supported actions are `'update'` and `'delete`'.
 
 `SyncInterface` exposes a contract for PHP invokable classes, and looks like this:
 
@@ -28,7 +31,7 @@ $args = []; // see CognitoSync for required arguments - note: requires aws/aws-s
 $sync = new CognitoSync(...$args);
 
 // note that all params to SyncRequest are optional. Syncing will or will not happen depending on what is given
-$request = SyncRequest::fromArray(['password' => 'newcleartextpassword', 'email_address' => 'newemail@email.com']);
+$request = SyncRequest::fromArray(['password' => 'newcleartextpassword', 'email_address' => 'newemail@email.com', 'action' => 'update']);
 $user = ExampleUserRepository::fetch($userId); // $user can be any object that implements the included SyncableUserInterface
 $sync($user, $request); // tada!
 ```
