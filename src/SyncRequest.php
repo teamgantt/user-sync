@@ -10,21 +10,29 @@ class SyncRequest implements SyncRequestInterface
      * @var string
      */
     private $emailAddress;
+
     /**
      * @var string
      */
     private $password;
 
     /**
+     * @var string
+     */
+    private $action;
+
+    /**
      * SyncRequest constructor.
      *
      * @param null|string $password
      * @param null|string $emailAddress
+     * @param string $action
      */
-    private function __construct($password, $emailAddress)
+    private function __construct($password, $emailAddress, $action = 'update')
     {
         $this->password = $password;
         $this->emailAddress = $emailAddress;
+        $this->action = $action;
     }
 
     /**
@@ -36,7 +44,7 @@ class SyncRequest implements SyncRequestInterface
      */
     public static function fromArray(array $properties)
     {
-        return new static($properties['password'] ?? null, $properties['email_address'] ?? null);
+        return new static($properties['password'] ?? null, $properties['email_address'] ?? null, $properties['action'] ?? 'update');
     }
 
     /**
@@ -77,5 +85,13 @@ class SyncRequest implements SyncRequestInterface
     public function isEmpty()
     {
         return !$this->hasPassword() && !$this->hasEmailAddress();
+    }
+
+    /**
+     * @return string 
+     */
+    public function getAction()
+    {
+        return $this->action;
     }
 }

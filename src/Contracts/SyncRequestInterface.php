@@ -28,4 +28,10 @@ interface SyncRequestInterface
      * @return bool
      */
     public function isEmpty();
+
+    /**
+     * 
+     * @return string
+     */
+    public function getAction();
 }

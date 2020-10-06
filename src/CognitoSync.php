@@ -3,6 +3,7 @@
 namespace TeamGantt\UserSync;
 
 use Exception;
+use RuntimeException;
 use Aws\CognitoIdentityProvider\CognitoIdentityProviderClient;
 use Aws\Exception\AwsException;
 use Psr\Log\LoggerInterface;
@@ -27,6 +28,11 @@ class CognitoSync implements SyncInterface
      * @var LoggerInterface
      */
     protected $logger;
+
+    /**
+     * @var string[]
+     */
+    private static $supportedActions = ['update', 'delete'];
 
     /**
      * CognitoSyncPassword constructor.
@@ -59,34 +65,21 @@ class CognitoSync implements SyncInterface
             return true;
         }
 
+        $action = $request->getAction();
+
+        if (array_search($action, self::$supportedActions) === false) {
+            throw new RuntimeException("Invalid action \"$action\" given");
+        }
+
         try {
-            if ($request->hasPassword()) {
-                $this->client->adminSetUserPassword([
-                    'Password' => $request->getPassword(),
-                    'Permanent' => true,
-                    'Username' => $user->getSyncableUsername(),
-                    'UserPoolId' => $this->clientDetail->getPoolId(),
-                ]);
+            switch ($action) {
+                case 'update':
+                    return $this->update($user, $request);
+                case 'delete':
+                    return $this->delete($request);
+                default:
+                    return false;
             }
-
-            if ($request->hasEmailAddress()) {
-                $this->client->adminUpdateUserAttributes([
-                    'UserPoolId' => $this->clientDetail->getPoolId(),
-                    'Username' => $user->getSyncableUsername(),
-                    'UserAttributes' => [
-                        [
-                            'Name' => 'email',
-                            'Value' => $request->getEmailAddress(),
-                        ],
-                        [
-                            'Name' => 'email_verified',
-                            'Value' => 'true',
-                        ],
-                    ],
-                ]);
-            }
-
-            return true;
         } catch (AwsException $e) {
             $type = $e->getAwsErrorCode();
             switch ($type) {
@@ -105,5 +98,65 @@ class CognitoSync implements SyncInterface
         }
 
         return false;
+    }
+
+    /**
+     * Update the user in the remote store
+     * 
+     * @param SyncableUserInterface $user 
+     * @param SyncRequestInterface $request 
+     * @return bool 
+     */
+    private function update(SyncableUserInterface $user, SyncRequestInterface $request)
+    {
+        if ($request->hasPassword()) {
+            $this->client->adminSetUserPassword([
+                'Password' => $request->getPassword(),
+                'Permanent' => true,
+                'Username' => $user->getSyncableUsername(),
+                'UserPoolId' => $this->clientDetail->getPoolId(),
+            ]);
+        }
+
+        if ($request->hasEmailAddress()) {
+            $this->client->adminUpdateUserAttributes([
+                'UserPoolId' => $this->clientDetail->getPoolId(),
+                'Username' => $user->getSyncableUsername(),
+                'UserAttributes' => [
+                    [
+                        'Name' => 'email',
+                        'Value' => $request->getEmailAddress(),
+                    ],
+                    [
+                        'Name' => 'email_verified',
+                        'Value' => 'true',
+                    ],
+                ],
+            ]);
+        }
+
+        return true;
+    }
+
+    /**
+     * Remove the user from the remote store.
+     * 
+     * @todo perhaps SyncRequestInterface should make usernames more generic - i.e getUsername returns an email address
+     * 
+     * @param SyncRequestInterface $request
+     * @return bool
+     */
+    private function delete(SyncRequestInterface $request)
+    {
+        if (!$request->hasEmailAddress()) {
+            return false;
+        }
+
+        $this->client->adminDeleteUser([
+            'UserPoolId' => $this->clientDetail->getPoolId(),
+            'Username' => $request->getEmailAddress(),
+        ]);
+
+        return true;
     }
 }

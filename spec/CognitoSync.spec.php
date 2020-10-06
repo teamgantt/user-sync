@@ -28,6 +28,14 @@ describe('CognitoSync', function () {
             expect($this->sync($this->user, $request))->toBe(true);
         });
 
+        it('should throw an exception for an unsupported action', function () {
+            $request = SyncRequest::fromArray(['action' => 'party', 'email_address' => 'brian@internet.com']);
+            $sut = function () use ($request) {
+                $this->sync($this->user, $request);
+            };
+            expect($sut)->toThrow(new RuntimeException('Invalid action "party" given'));
+        });
+
         it('should sync the password to what is in the request', function () {
             $request = SyncRequest::fromArray(['password' => 'secret']);
             
@@ -63,6 +71,21 @@ describe('CognitoSync', function () {
             ]);
 
             expect($this->sync($this->user, $request))->toBe(true);
+        });
+
+        it('should delete a user based on a delete action and the request data', function () {
+            $request = SyncRequest::fromArray(['email_address' => 'brian@internet.com', 'action' => 'delete']);
+            allow($this->client)->toReceive('adminDeleteUser')->andReturn([]);
+            expect($this->client)->toReceive('adminDeleteUser')->with([
+                'UserPoolId' => 'pool-id',
+                'Username' => 'brian@internet.com'
+            ]);
+            expect($this->sync($this->user, $request))->toBe(true);
+        });
+
+        it('should return false if the delete request has no email address', function () {
+            $request = SyncRequest::fromArray(['password' => 'secret', 'action' => 'delete']);
+            expect($this->sync($this->user, $request))->toBe(false);
         });
 
         it('should ignore UserNotFoundExceptions', function () {
