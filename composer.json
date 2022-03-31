@@ -19,8 +19,8 @@
         "psr/log": "^1.1"
     },
     "require-dev": {
-        "aws/aws-sdk-php": "^3.137",
-        "kahlan/kahlan": "^4.7"
+        "aws/aws-sdk-php": "^3.217",
+        "kahlan/kahlan": "^5.0"
     },
     "scripts": {
         "test": "kahlan"
