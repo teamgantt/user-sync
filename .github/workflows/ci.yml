@@ -7,22 +7,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
-      - name: Cache PHP dependencies
-        uses: actions/cache@v1
+      - name: Cache Composer dependencies
+        uses: actions/cache@v2
         with:
-          path: vendor
+          path: |
+            vendor
+            /tmp/composer-cache
           key: ${{ runner.OS }}-build-${{ hashFiles('**/composer.lock') }}
 
       - name: Install dependencies
-        uses: MilesChou/composer-action@master
-        with:
-          args: install
+        uses: php-actions/composer@v6
 
-      - name: Run tests
-        uses: MilesChou/composer-action@master
+      - name: Run integration tests
+        uses: php-actions/composer@v6
         with:
-          args: test
+          php_version: 8.1
+          command: test
