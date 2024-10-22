@@ -1,28 +1,30 @@
 {
-    "name": "teamgantt/user-sync",
-    "description": "Sync user data with external stores",
-    "type": "library",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Brian Scaturro",
-            "email": "scaturrob@gmail.com"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "TeamGantt\\UserSync\\": ["src/"]
-        }
-    },
-    "require": {
-        "php": ">=7.0",
-        "psr/log": "^1.1"
-    },
-    "require-dev": {
-        "aws/aws-sdk-php": "^3.217",
-        "kahlan/kahlan": "^5.0"
-    },
-    "scripts": {
-        "test": "kahlan"
+  "name": "teamgantt/user-sync",
+  "description": "Sync user data with external stores",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Brian Scaturro",
+      "email": "scaturrob@gmail.com"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "TeamGantt\\UserSync\\": [
+        "src/"
+      ]
+    }
+  },
+  "require": {
+    "php": ">=7.0",
+    "psr/log": "^3.0.2"
+  },
+  "require-dev": {
+    "aws/aws-sdk-php": "^3.217",
+    "kahlan/kahlan": "^5.0"
+  },
+  "scripts": {
+    "test": "kahlan"
+  }
 }
